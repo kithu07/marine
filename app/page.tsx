@@ -5,15 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Globe2, Ship, House as LightHouse, Map, PlayCircle, Apple } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center">
+      <section className="relative min-h-screen flex items-center bg-[#0C0C0C] p-[0.2px] border-r-[0.2px] border-b-[0.2px] rounded-br-[41px] overflow-hidden">
+               
         <div className="container mx-auto px-4 py-12 relative z-10">
           <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-7xl font-bold mb-4">
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white">
               Track any<br />Vessel, Anywhere!
             </h1>
             <p className="text-xl mb-8 text-gray-300">Stay ahead of the waves!</p>
@@ -22,9 +24,10 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <div className="absolute right-0 bottom-0 w-full md:w-2/3 h-2/3">
+        <div className="absolute right-0 bottom-0 w-[823.38px] h-[276px] md:w-[70vw] md:h-auto max-w-full"
+          style={{ aspectRatio: "823.38 / 276" }}>
           <Image
-            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80"
+            src="/Earth.png"
             alt="Earth from space"
             fill
             className="object-cover rounded-tl-3xl"
@@ -32,6 +35,7 @@ export default function Home() {
           />
         </div>
       </section>
+
 
       {/* Features Section */}
       <section className="py-24 container mx-auto px-4">
@@ -104,28 +108,34 @@ export default function Home() {
       {/* Download Section */}
       <section className="py-12 container mx-auto px-4">
         <div className="bg-blue-600 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
-          <div>
-            <h2 className="text-4xl font-bold mb-4">Get the app now</h2>
-            <div className="flex gap-4">
-              <Button variant="secondary" className="gap-2">
-                <PlayCircle className="w-5 h-5" /> Android
-              </Button>
-              <Button variant="secondary" className="gap-2">
-                <Apple className="w-5 h-5" /> iOS
-              </Button>
+
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <h1 className="text-white text-2xl font-bold text-center md:text-left">
+              Get the App <br /> Now
+            </h1>
+
+            <div className="flex items-center gap-4">
+              <div className="w-[50px] h-[40px] md:w-[60px] md:h-[48px] lg:w-[70px] lg:h-[56px] flex items-center justify-center bg-white rounded-3xl shadow-md">
+                <img src="/android.png" alt="Play Store" className="w-6 h-6" />
+              </div>
+              <div className="w-[50px] h-[40px] md:w-[60px] md:h-[48px] lg:w-[70px] lg:h-[56px] flex items-center justify-center bg-white rounded-3xl shadow-md">
+                <img src="/apple.png" alt="App Store" className="w-6 h-6" />
+              </div>
             </div>
           </div>
+
           <div className="mt-8 md:mt-0">
             <Image
-              src="https://images.unsplash.com/photo-1577125305658-dee71d4e3027?auto=format&fit=crop&q=80"
+              src="/ship.png"
               alt="Ship"
-              width={300}
-              height={200}
+              width={200}
+              height={100}
               className="rounded-lg"
             />
           </div>
         </div>
       </section>
+
 
       {/* Footer */}
       <footer className="border-t border-gray-800 py-12">
