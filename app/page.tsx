@@ -1,9 +1,8 @@
 "use client";
-
+import PricingCard from "@/components/PricingCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Globe2, Ship, House as LightHouse, Map, PlayCircle, Apple } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,9 +10,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center bg-[#0C0C0C] p-[0.2px] border-r-[0.2px] border-b-[0.2px] rounded-br-[41px] overflow-hidden">
+      <section className="relative min-h-screen flex bg-[#0C0C0C] border-r-[0.2px] border-b-[0.2px] rounded-br-[41px] overflow-hidden">
                
-        <div className="container mx-auto px-4 py-12 relative z-10">
+        <div className="container mx-auto px-4 my-48 relative z-10">
           <div className="max-w-3xl">
             <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white">
               Track any<br />Vessel, Anywhere!
@@ -39,30 +38,59 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="py-24 container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-12">Every Vessel, Every Move</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <FeatureCard
-            title="Detailed vessel info"
-            description="Track real-time ship data — names, types, routes, destinations, and full history at your fingertips."
-            icon={<Ship className="w-6 h-6" />}
-          />
-          <FeatureCard
-            title="Ports at a glance"
-            description="Comprehensive port information with real-time updates on vessel movements and port activities."
-            icon={<Globe2 className="w-6 h-6" />}
-          />
-          <FeatureCard
-            title="Light house insights"
-            description="Access detailed lighthouse data and maritime navigation information for safer voyages."
-            icon={<LightHouse className="w-6 h-6" />}
-          />
+        <h2 className="text-3xl font-bold mb-4 text-left">Every Vessel, Every Move</h2>
+        <p className="text-[#AAAAAA] mb-10 text-sm font-medium rounded-md inline-block w-full max-w-xs md:max-w-md min-h-[29px]">
+          Tap into live ship data — names, types, routes, destinations, and full history at your fingertips.
+        </p>
+
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          <div className="w-full max-w-md border-[0.2px] rounded-[32px] shadow-md flex flex-col overflow-hidden">
+            <div className="w-full h-auto aspect-[307/140] bg-gray-200 rounded-t-[12px]">
+              <img src="/feature.png" alt="Vessel" className="w-full h-full object-cover rounded-t-[12px]" />
+            </div>
+            <div className="flex-1 p-6 flex flex-col justify-center text-left">
+              <h3 className="text-lg font-semibold mb-2">Detailed vessel info</h3>
+              <p className="text-gray-600">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commo
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full max-w-md border-[0.2px] rounded-[32px] shadow-md flex flex-col-reverse overflow-hidden">
+            <div className="w-full h-auto aspect-[307/140] bg-gray-200 rounded-b-[12px]">
+              <img src="/feature.png" alt="Port" className="w-full h-full object-cover rounded-b-[12px]" />
+            </div>
+            <div className="flex-1 p-6 flex flex-col justify-center text-left">
+              <h3 className="text-lg font-semibold mb-2">Ports at a glance</h3>
+              <p className="text-gray-600">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commo
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full max-w-md border-[0.2px] rounded-[32px] shadow-md flex flex-col overflow-hidden">
+            <div className="w-full h-auto aspect-[307/140] bg-gray-200 rounded-t-[12px]">
+              <img src="feature.png" alt="Lighthouse" className="w-full h-full object-cover rounded-t-[12px]" />
+            </div>
+            <div className="flex-1 p-6 flex flex-col justify-center text-left">
+              <h3 className="text-lg font-semibold mb-2">Lighthouse insights</h3>
+              <p className="text-gray-600">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commo
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
+
       {/* Pricing Section */}
-      <section className="py-24 bg-gray-900">
+      <section className="py-24">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12">Smart plans for every voyage</h2>
+          <h2 className="text-3xl font-bold mb-4 text-left">Smart plans for every voyage</h2>
+          <p className="text-[#AAAAAA] mb-10 text-sm font-medium rounded-md inline-block w-full max-w-xs md:max-w-md min-h-[29px]">
+            Hear from our marine enthusiasts about how Marine Radar has enhanced their navigation and delivered real-time insights at sea.
+          </p>
           <div className="grid md:grid-cols-3 gap-8">
             <PricingCard
               title="Free"
@@ -85,36 +113,51 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-12">Frequently asked questions</h2>
-        <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-4">
-            <FaqItem
-              question="How cool is this app"
-              answer="Our app provides cutting-edge vessel tracking technology with an intuitive interface."
-            />
-            <FaqItem
-              question="Its design is incredibly user-friendly"
-              answer="We've focused on creating a seamless and intuitive user experience."
-            />
-            <FaqItem
-              question="The features are intuitive and easy to navigate"
-              answer="Every feature is designed with user experience in mind, making navigation effortless."
-            />
+      <section className="py-24 px-4 mb-10">
+        <div className="text-left max-w-2xl">
+          <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
+          <p className="text-[#AAAAAA] mb-10 mt-2">
+            Hear from our marine enthusiasts about how Marine Radar has enhanced their navigation and delivered real-time insights at sea.
+          </p>
+        </div>
+
+        {/* FAQ Body */}
+        <div className="max-w-5xl">
+          <Accordion type="multiple" className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <FaqItem question="How cool is this app?" answer="Our app provides cutting-edge vessel tracking." />
+              <FaqItem question="Is the design user-friendly?" answer="We've focused on creating a seamless UI." />
+              <FaqItem question="Are the features easy to navigate?" answer="Every feature is designed with UX in mind." />
+            </div>
+            <div className="space-y-4">
+              <FaqItem question="It offers seamless integration with other tools" answer="We use advanced satellite data for accuracy." />
+              <FaqItem question="The performance is consistently reliable and fast" answer="Yes! It's compatible with web and mobile." />
+              <FaqItem question="User feedback has been overwhelmingly positive" answer="Yes, we offer 24/7 customer support." />
+            </div>
           </Accordion>
+
+          <div className="text-left mt-10">
+            <p className="text-[#AAAAAA]">
+              Couldn’t find your answer?{" "}
+              <a href="/contact" className="text-[#0A84FF] font-medium hover:underline">Talk to us</a>
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Download Section */}
-      <section className="py-12 container mx-auto px-4">
-        <div className="bg-blue-600 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
 
+
+      {/* Download Section */}
+      <section className="py-12 container mx-auto px-4 mb-20">
+        <div className="bg-[#0A84FF] rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
+          
           <div className="flex flex-col items-center md:items-start gap-4">
-            <h1 className="text-white text-2xl font-bold text-center md:text-left">
-              Get the App <br /> Now
+            <h1 className="text-white font-semibold text-3xl md:text-4xl lg:text-[62px] leading-tight text-center md:text-left">
+              Get the App <br />
+              <span className="opacity-60">now</span>
             </h1>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 my-6">
               <div className="w-[50px] h-[40px] md:w-[60px] md:h-[48px] lg:w-[70px] lg:h-[56px] flex items-center justify-center bg-white rounded-3xl shadow-md">
                 <img src="/android.png" alt="Play Store" className="w-6 h-6" />
               </div>
@@ -124,7 +167,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-8 md:mt-0">
+          <div className="relative pt-6 md:mt-0">
+            <Image
+              src="/name.png"
+              alt="Extra"
+              width={1300}
+              height={1300}
+              className="absolute -top-5 -left-6 md:-top-12 md:-left-10"
+            />
             <Image
               src="/ship.png"
               alt="Ship"
@@ -133,18 +183,20 @@ export default function Home() {
               className="rounded-lg"
             />
           </div>
+
         </div>
       </section>
 
 
+
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-12">
+      <footer className="border-t border-gray-800 py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <Ship className="w-6 h-6" />
-              <span className="font-bold">Marine Radar</span>
-            </div>
+            <Link href="/" className="flex items-center gap-2">
+              <Image src="/logo.png" alt="Logo" width={40} height={40} />
+              <span className="text-xl font-bold">Marine Radar</span>
+            </Link>
             <nav className="flex gap-6">
               <a href="#" className="hover:text-blue-500">Home</a>
               <a href="#" className="hover:text-blue-500">Experience</a>
@@ -156,41 +208,6 @@ export default function Home() {
         </div>
       </footer>
     </main>
-  );
-}
-
-function FeatureCard({ title, description, icon }: { title: string; description: string; icon: React.ReactNode }) {
-  return (
-    <Card className="p-6 bg-gray-900 border-gray-800">
-      <div className="mb-4 text-blue-500">{icon}</div>
-      <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <p className="text-gray-400">{description}</p>
-    </Card>
-  );
-}
-
-function PricingCard({ title, price, features, highlighted = false }: {
-  title: string;
-  price: string;
-  features: string[];
-  highlighted?: boolean;
-}) {
-  return (
-    <Card className={`p-6 ${highlighted ? 'bg-blue-600' : 'bg-gray-800'} border-0`}>
-      <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <div className="text-3xl font-bold mb-6">{price} / Month</div>
-      <ul className="space-y-4 mb-6">
-        {features.map((feature, index) => (
-          <li key={index} className="flex items-center gap-2">
-            <Map className="w-4 h-4 text-blue-400" />
-            {feature}
-          </li>
-        ))}
-      </ul>
-      <Button className={`w-full ${highlighted ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
-        Get started
-      </Button>
-    </Card>
   );
 }
 
