@@ -1,4 +1,5 @@
 name: CI/CD
+
 on:
   push:
     branches: [main]
@@ -11,10 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: npm install
-      - name: Run tests
-        if: contains(github.event.pull_request.labels.*.name, 'test') || github.event_name == 'push'
-        run: echo "No tests configured"
+        run: npm ci
+      - name: Build
+        run: npm run build
 
   cd:
     needs: ci
@@ -25,11 +25,10 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: ACR Login
+      - name: Login to ACR
         run: |
           echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
       - name: Build and push frontend image
-        if: has_frontend == 'True'
         run: |
           docker build -f Dockerfile.frontend -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
@@ -41,17 +40,12 @@ jobs:
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
-          if [ -f "k8s/frontend-deployment.yaml" ]; then
-            kubectl apply -f k8s/frontend-deployment.yaml
-          fi
+          kubectl apply -f k8s/frontend-deployment.yaml
       - name: Check rollout status
         run: |
-          if [ -f "k8s/frontend-deployment.yaml" ]; then
-            kubectl rollout status deployment/frontend -n workflow-dashboard
-          fi
+          kubectl rollout status deployment/workflow-frontend -n workflow-dashboard
       - name: Show services
         run: kubectl get svc -n workflow-dashboard
-      - name: Show public IP
+      - name: Print public IP
         run: |
-          echo "Frontend service IP:"
-          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
+          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[*].status.loadBalancer.ingress[0].ip}'
