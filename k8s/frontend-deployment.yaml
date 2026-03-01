@@ -19,6 +19,8 @@ spec:
         app: workflow-frontend
     spec:
       terminationGracePeriodSeconds: 30
+      imagePullSecrets:
+        - name: acr-pull-secret
       containers:
         - name: frontend
           image: ACR_REGISTRY/workflow-frontend:latest
