@@ -1,10 +1,8 @@
-name: Build and Deploy
-
+name: CI/CD
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 concurrency: cicd-${{ github.ref }}
 
 jobs:
@@ -32,7 +30,9 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
       - name: Build and push frontend image
         run: |
-          docker build -f Dockerfile.frontend -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
+          docker build -f Dockerfile.frontend \
+            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_PUBLIC_URL || '' }} \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
       - name: Get AKS credentials
         run: |
@@ -40,22 +40,19 @@ jobs:
             --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
             --name ${{ secrets.AKS_CLUSTER_NAME }} \
             --overwrite-existing
-      - name: Create namespace
-        run: kubectl create namespace workflow-dashboard --dry-run=client -o yaml | kubectl apply -f -
+      - name: Apply namespace
+        run: kubectl apply -f k8s/namespace.yaml
       - name: Create ACR pull secret
         run: |
           kubectl create secret docker-registry acr-pull-secret \
             --namespace workflow-dashboard \
             --docker-server=${{ secrets.ACR_LOGIN_SERVER }} \
             --docker-username=${{ secrets.ACR_USERNAME }} \
-            --docker-password=${{ secrets.ACR_PASSWORD }} \
-            --dry-run=client -o yaml | kubectl apply -f -
-      - name: Apply deployment
+            --docker-password=${{ secrets.ACR_PASSWORD }}
+      - name: Apply frontend
         run: |
           ACR="${{ secrets.ACR_LOGIN_SERVER }}"
           sed "s|ACR_REGISTRY|$ACR|g" k8s/frontend-deployment.yaml | kubectl apply -f -
-      - name: Apply service
-        run: kubectl apply -f k8s/frontend-service.yaml
       - name: Diagnose deployment
         run: |
           kubectl get pods -n workflow-dashboard -o wide
