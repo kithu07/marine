@@ -1,0 +1,54 @@
+name: CI/CD
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency: cicd-${{ github.ref }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        if: contains(github.event.pull_request.labels.*.name, 'test') || github.event_name == 'push'
+        run: npm test
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: ACR Login
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+      - name: Build and push frontend image
+        if: has_frontend == 'True'
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest -f Dockerfile.frontend .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
+      - name: Get AKS credentials
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+      - name: Apply namespace
+        run: kubectl apply -f k8s/namespace.yaml
+      - name: Apply frontend deployment
+        if: has_frontend == 'True'
+        run: kubectl apply -f k8s/frontend-deployment.yaml
+      - name: Check rollout status
+        if: has_frontend == 'True'
+        run: kubectl rollout status deployment/frontend-deployment -n workflow-dashboard
+      - name: Show services
+        run: kubectl get svc -n workflow-dashboard
+      - name: Show public IP
+        run: |
+          echo "Frontend public IP:"
+          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
