@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
       - name: Install dependencies
         run: npm ci
       - name: Build
@@ -28,23 +24,21 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: azure/acr-login@v1
-        uses: azure/acr-login@v1
-        with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+      - name: ACR Login
+        run: |
+          az acr login --name workflowdashboardacr
       - name: Build and push frontend image
         run: |
           docker build -f Dockerfile.frontend \
             --build-arg NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_PUBLIC_URL || '' }} \
-            -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
+            -t workflowdashboardacr.azurecr.io/workflow-frontend:latest .
+          docker push workflowdashboardacr.azurecr.io/workflow-frontend:latest
       - name: Get AKS credentials
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
+            --name ${{ secrets.AKS_CLUSTER_NAME }} \
+            --overwrite-existing
       - name: Create namespace
         run: kubectl create namespace workflow-dashboard --dry-run=client -o yaml | kubectl apply -f -
       - name: Create ACR pull secret
@@ -53,9 +47,10 @@ jobs:
             --docker-server=${{ secrets.ACR_LOGIN_SERVER }} \
             --docker-username=${{ secrets.ACR_USERNAME }} \
             --docker-password=${{ secrets.ACR_PASSWORD }} \
-            --namespace=workflow-dashboard
-      - name: Apply frontend manifest
-        run: kubectl apply -f deployment.frontend.yaml -n workflow-dashboard
+            --namespace=workflow-dashboard \
+            --dry-run=client -o yaml | kubectl apply -f -
+      - name: Apply deployment
+        run: kubectl apply -f k8s/ -n workflow-dashboard
       - name: Diagnose deployment
         run: |
           kubectl get pods -n workflow-dashboard -o wide
