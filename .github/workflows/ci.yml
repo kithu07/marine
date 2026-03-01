@@ -1,8 +1,10 @@
-name: CI/CD
+name: Build and Deploy
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 concurrency: cicd-${{ github.ref }}
 
 jobs:
@@ -20,19 +22,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Azure Login
-        uses: azure/login@v1
+      - uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: ACR Login
-        run: |
-          az acr login --name workflowdashboardacr
+      - uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
       - name: Build and push frontend image
         run: |
-          docker build -f Dockerfile.frontend \
-            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_PUBLIC_URL || '' }} \
-            -t workflowdashboardacr.azurecr.io/workflow-frontend:latest .
-          docker push workflowdashboardacr.azurecr.io/workflow-frontend:latest
+          docker build -f Dockerfile.frontend -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
       - name: Get AKS credentials
         run: |
           az aks get-credentials \
@@ -44,13 +45,17 @@ jobs:
       - name: Create ACR pull secret
         run: |
           kubectl create secret docker-registry acr-pull-secret \
+            --namespace workflow-dashboard \
             --docker-server=${{ secrets.ACR_LOGIN_SERVER }} \
             --docker-username=${{ secrets.ACR_USERNAME }} \
             --docker-password=${{ secrets.ACR_PASSWORD }} \
-            --namespace=workflow-dashboard \
             --dry-run=client -o yaml | kubectl apply -f -
       - name: Apply deployment
-        run: kubectl apply -f k8s/ -n workflow-dashboard
+        run: |
+          ACR="${{ secrets.ACR_LOGIN_SERVER }}"
+          sed "s|ACR_REGISTRY|$ACR|g" k8s/frontend-deployment.yaml | kubectl apply -f -
+      - name: Apply service
+        run: kubectl apply -f k8s/frontend-service.yaml
       - name: Diagnose deployment
         run: |
           kubectl get pods -n workflow-dashboard -o wide
