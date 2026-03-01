@@ -29,25 +29,26 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Login to ACR
+      - name: az acr login
         run: |
-          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+          az acr login --name ${{ secrets.ACR_LOGIN_SERVER }} --username ${{ secrets.ACR_USERNAME }} --password ${{ secrets.ACR_PASSWORD }}
       - name: Build and push frontend image
         run: |
           docker build -f Dockerfile.frontend -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
       - name: Get AKS credentials
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+        run: |
+          az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }} --overwrite-existing
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/frontend-deployment.yaml
+          kubectl apply -f k8s/frontend-service.yaml
+      - name: Check rollout status
+        run: |
           kubectl rollout status deployment/workflow-frontend -n workflow-dashboard --timeout=600s
       - name: Show services
         run: kubectl get svc -n workflow-dashboard
       - name: Print public IP
         run: |
-          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[*].status.loadBalancer.ingress[0].ip}'
+          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
