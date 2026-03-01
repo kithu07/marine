@@ -8,6 +8,8 @@ metadata:
 spec:
   replicas: 1
   progressDeadlineSeconds: 900
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: workflow-frontend
@@ -16,6 +18,7 @@ spec:
       labels:
         app: workflow-frontend
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
         - name: frontend
           image: ACR_REGISTRY/workflow-frontend:latest
