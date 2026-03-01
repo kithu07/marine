@@ -1,4 +1,5 @@
 name: CI/CD
+
 on:
   push:
     branches: [main]
@@ -11,9 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       - name: Install dependencies
         run: npm ci
       - name: Build
@@ -44,5 +45,9 @@ jobs:
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/frontend-deployment.yaml
-          kubectl rollout status deployment/workflow-frontend -n workflow-dashboard
-          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
+          kubectl rollout status deployment/workflow-frontend -n workflow-dashboard --timeout=600s
+      - name: Show services
+        run: kubectl get svc -n workflow-dashboard
+      - name: Print public IP
+        run: |
+          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[*].status.loadBalancer.ingress[0].ip}'
