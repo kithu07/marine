@@ -1,10 +1,9 @@
-name: Build and Deploy
+name: CI/CD
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 concurrency: cicd-${{ github.ref }}
 
 jobs:
@@ -32,7 +31,9 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
       - name: Build and push frontend image
         run: |
-          docker build -f Dockerfile.frontend -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
+          docker build -f Dockerfile.frontend \
+            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_PUBLIC_URL || '' }} \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
       - name: Get AKS credentials
         run: |
